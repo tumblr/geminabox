@@ -1,7 +1,7 @@
 Gem::Specification.new do |s|
-  s.name              = 'geminabox'
+  s.name              = 'geminabox-client'
   s.version           = '0.3.0'
-  s.summary           = 'Really simple rubygem hosting'
+  s.summary           = 'Really simple rubygem hosting - The Client'
   s.description       = 'A sinatra based gem hosting app, with client side gem push style functionality.'
   s.author            = 'Tom Lea'
   s.email             = 'contrib@tomlea.co.uk'
@@ -11,8 +11,6 @@ Gem::Specification.new do |s|
   s.extra_rdoc_files  = %w[README.markdown]
   s.rdoc_options      = %w[--main README.markdown]
 
-  s.files             = %w[README.markdown]
-
-  s.add_dependency('geminabox-server', s.version)
-  s.add_dependency('geminabox-client', s.version)
+  s.files             = %w[README.markdown lib/rubygems_plugin.rb] + Dir['lib/rubygems/**/*']
+  s.require_paths     = ['lib']
 end

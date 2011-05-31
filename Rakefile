@@ -4,7 +4,10 @@ require "rake/rdoctask"
 
 task :default => :package
 
-Rake::GemPackageTask.new(eval(File.read("geminabox.gemspec"))) do |pkg|
+%w[geminabox geminabox-client geminabox-server].each do |name|
+  spec = eval(File.read("#{name}.gemspec"))
+  Rake::GemPackageTask.new(spec) do |pkg|
+  end
 end
 
 Rake::RDocTask.new do |rd|
