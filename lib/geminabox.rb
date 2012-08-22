@@ -18,6 +18,9 @@ class Geminabox < Sinatra::Base
   set :incremental_updates, false
   set :views, File.join(File.dirname(__FILE__), *%w[.. views])
   set :allow_replace, false
+
+  require 'geminabox/hooks'
+  set :hooks, Geminabox::Hooks.new
   use Hostess
 
   class << self
@@ -85,6 +88,7 @@ class Geminabox < Sinatra::Base
 
   delete '/gems/*.gem' do
     File.delete file_path if File.exists? file_path
+    settings.hooks.call :path => file_path.to_s, :type => :delete
     reindex(:force_rebuild)
     redirect url("/")
   end
@@ -113,7 +117,9 @@ class Geminabox < Sinatra::Base
     gem_name = File.basename(name)
     dest_filename = File.join(settings.data, "gems", gem_name)
 
-    if Geminabox.disallow_replace? and File.exist?(dest_filename)
+    already_exists = File.exist?(dest_filename)
+
+    if Geminabox.disallow_replace? and already_exists
       existing_file_digest = Digest::SHA1.file(dest_filename).hexdigest
       tmpfile_digest = Digest::SHA1.file(tmpfile.path).hexdigest
 
@@ -123,14 +129,21 @@ class Geminabox < Sinatra::Base
         error_response(200, "Ignoring upload, you uploaded the same thing previously.")
       end
     end
-    
+
     atomic_write(dest_filename) do |f|
       while blk = tmpfile.read(65536)
         f << blk
       end
     end
+
     reindex
-    
+
+    if already_exists
+      settings.hooks.call :path => dest_filename.to_s, :type => :change
+    else
+      settings.hooks.call :path => dest_filename.to_s, :type => :create
+    end
+
     if api_request?
       "Gem #{gem_name} received and indexed."
     else
@@ -211,7 +224,7 @@ HTML
     temp_file.close
     File.rename(temp_file.path, file_name)
   end
-  
+
   helpers do
     def spec_for(gem_name, version)
       spec_file = File.join(settings.data, "quick", "Marshal.#{Gem.marshal_version}", "#{gem_name}-#{version}.gemspec.rz")
