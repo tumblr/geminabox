@@ -104,12 +104,17 @@ class Geminabox::TestCase < MiniTest::Unit::TestCase
   end
 
   def execute(command)
-    output = ""
-    IO.popen(command, "r") do |io|
-      data = io.read
-      output << data
+    Timeout.timeout 10 do
+      output = ""
+      IO.popen(command, "r") do |io|
+        data = io.read
+        output << data
+      end
+      output
     end
-    output
+  rescue
+    puts `gem -v`
+    raise
   end
 
   def gemcutter_push(gemfile)
