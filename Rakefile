@@ -12,6 +12,7 @@ require 'rake/testtask'
 Rake::TestTask.new("test:integration") do |t|
   t.libs << "test" << "lib"
   t.pattern = "test/integration/**/*_test.rb"
+  t.verbose = true
 end
 
 Rake::TestTask.new("test:smoke:paranoid") do |t|
