@@ -120,6 +120,7 @@ class Geminabox::TestCase < MiniTest::Unit::TestCase
   def gemcutter_push(gemfile)
     Geminabox::TestCase.setup_fake_home!
     command = "GEM_HOME=#{FAKE_HOME} gem push #{gemfile} --host '#{config.url_with_port(@test_server_port)}' 2>&1"
+    puts "About to run #{command.inspect}"
     execute(command)
   end
 
