@@ -18,27 +18,28 @@ class LargeGemListSpec < Geminabox::TestCase
       assert_can_push(:my_gem, :version => '6.0')
     end
 
+
     visit url_for("/")
 
-    assert_equal gems_on_page, %w[
+    assert_equal %w[
       my_gem-6.0
       my_gem-5.0
       my_gem-4.0
       my_gem-3.0
       my_gem-2.0
       unrelated_gem-1.0
-    ]
+    ], gems_on_page
 
     page.click_link 'Older versions...'
 
-    assert_equal gems_on_page, %w[
+    assert_equal %w[
       my_gem-6.0
       my_gem-5.0
       my_gem-4.0
       my_gem-3.0
       my_gem-2.0
       my_gem-1.0
-    ]
+    ], gems_on_page
   end
 
   def gems_on_page

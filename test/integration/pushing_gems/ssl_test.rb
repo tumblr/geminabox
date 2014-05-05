@@ -1,11 +1,9 @@
 require 'test_helper'
+if Geminabox::TestCase.check_ssl_certificate_setup!
+  class SSLTest < Geminabox::TestCase
+    url "https://localhost/"
+    ssl true
 
-class SSLTest < Geminabox::TestCase
-  url "https://localhost/"
-  ssl true
-  should_push_gem
-  # test "s" do
-  #   puts url_for("/")
-  #   sleep 1000
-  # end
+    should_push_gem
+  end
 end

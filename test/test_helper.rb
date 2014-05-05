@@ -24,8 +24,33 @@ module TestMethodMagic
   end
 end
 
+
+
 class Minitest::Test
   extend TestMethodMagic
+
+  def self.localhost_certificate_installed?
+    c = OpenSSL::X509::Certificate.new(File.read(fixture("localhost.crt")))
+    OpenSSL::SSL::SSLContext::DEFAULT_CERT_STORE.verify(c)
+  end
+
+  def self.check_ssl_certificate_setup!
+    if localhost_certificate_installed?
+      true
+    else
+      warn "You need to install the test certificate into your openssl certificate list."
+      warn "SSL based test will not work without it"
+      if RUBY_PLATFORM.include? "darwin"
+        warn "In OS-X with homebrew, add #{fixture("localhost.crt")} to your system keychain."
+        warn "You can then use https://github.com/raggi/openssl-osx-ca to keep openssl in sync"
+      else
+        warn "Try adding #{fixture("localhost.crt")} to your system certs."
+        warn "You cna usually do this with:"
+        want %{   cat test/fixtures/localhost.crt >> "$( openssl version -d | awk -F'"' '{print $2}' )/cert.pem"}
+      end
+      false
+    end
+  end
 
   TEST_DATA_DIR="/tmp/geminabox-test-data"
   def clean_data_dir
