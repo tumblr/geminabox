@@ -182,9 +182,9 @@ class Geminabox::TestCase < Minitest::Test
       server_options.merge!(
         :SSLEnable => true,
         :SSLVerifyClient => OpenSSL::SSL::VERIFY_NONE,
-        :SSLPrivateKey => OpenSSL::PKey::RSA.new(File.read(fixture("127.0.0.1.key"))),
-        :SSLCertificate => OpenSSL::X509::Certificate.new(File.read(fixture("127.0.0.1.crt"))),
-        :SSLCertName => [["CN", "127.0.0.1"]]
+        :SSLPrivateKey => OpenSSL::PKey::RSA.new(File.read(fixture("localhost.key"))),
+        :SSLCertificate => OpenSSL::X509::Certificate.new(File.read(fixture("localhost.crt"))),
+        :SSLCertName => [["CN", "localhost"]]
       )
     end
 
