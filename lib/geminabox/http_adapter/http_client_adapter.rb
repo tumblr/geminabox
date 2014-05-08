@@ -29,6 +29,7 @@ module Geminabox
     def new_http_client
       http_client = HTTPClient.new(ENV['http_proxy'])
       http_client.ssl_config.set_default_paths
+      http_client.ssl_config.ssl_version = :SSLv23
       http_client.send_timeout = 0
       http_client.receive_timeout = 0
       http_client
