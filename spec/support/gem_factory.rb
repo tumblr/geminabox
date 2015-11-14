@@ -1,4 +1,6 @@
 class GemFactory
+  include Geminabox::FilenameGenerator
+
   class Cache
     def initialize(path)
       @path = Pathname.new(path)
@@ -37,11 +39,7 @@ class GemFactory
   end
 
   def gem(name, version = "1.0", platform: "ruby", deps: {})
-    name = String(name)
-    platform_for_filename = platform unless platform == "ruby"
-    filename_parts = [name, version, platform_for_filename].compact
-    filename = "#{filename_parts.join("-")}.gem"
-    path = @path.join(filename)
+    path = @path.join(gem_filename(name, version, platform))
 
     @global_cache.fetch_to_path(path, name, version, platform, deps) do
       build_gem(path, name, version, platform, deps)

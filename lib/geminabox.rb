@@ -7,3 +7,4 @@ module Geminabox
 end
 
 require "geminabox/server"
+require "geminabox/filename_generator"
