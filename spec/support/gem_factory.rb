@@ -47,31 +47,7 @@ class GemFactory
   end
 
   def build_gem(path, name, version, platform, deps)
-    dependencies = deps.collect do |dep, requirement|
-      dep = [*dep]
-      gem(*dep)
-      if requirement
-        "s.add_dependency(#{dep.first.to_s.inspect}, #{requirement.inspect})"
-      else
-        "s.add_dependency(#{dep.first.to_s.inspect})"
-      end
-    end.join("\n")
-
-    spec = %{
-      Gem::Specification.new do |s|
-        s.name              = #{name.inspect}
-        s.version           = #{version.inspect}
-        s.platform          = #{platform.inspect}
-        s.summary           = #{name.inspect}
-        s.description       = s.summary + " description"
-        s.author            = 'Test'
-        s.files             = []
-        s.email             = 'fake@fake.fake'
-        s.homepage          = 'http://fake.fake/fake'
-        s.licenses          = ['MIT']
-        #{dependencies}
-      end
-    }
+    spec = SpecFactory.new(name, version, platform, deps).spec
 
     Tempfile.open("spec") do |tmpfile|
       tmpfile << spec
