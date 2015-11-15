@@ -3,9 +3,9 @@ require 'geminabox/gem_store'
 
 class Geminabox::Server < Sinatra::Base
   attr_reader :gem_store
-  def initialize(data_path)
+  def initialize(gem_store)
     super()
-    @gem_store = Geminabox::GemStore.new(data_path)
+    @gem_store = Geminabox::GemStore(gem_store)
   end
 
   get'/' do

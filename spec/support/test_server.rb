@@ -2,12 +2,14 @@ require 'net/http'
 require 'webrick'
 
 class TestServer
+  attr_reader :gem_store
+
   def initialize(&block)
     @fixture_setup = block
   end
 
   def run
-    create_tempdir!
+    create_gemstore!
     start_server!
     setup_gems!
     wait_until_booted!
@@ -20,22 +22,20 @@ class TestServer
   end
 
 protected
-
-  def create_tempdir!
+  def create_gemstore!
     @dir = Pathname.new(Dir.mktmpdir)
+    @gem_store = Geminabox::GemStore(@dir)
   end
 
   def setup_gems!
-    Dir.chdir @dir do
-      gemset_factory = GemsetFactory.new("data")
-      @fixture_setup.call(gemset_factory)
-    end
+    gemset_factory = GemsetFactory.new(gem_store)
+    @fixture_setup.call(gemset_factory)
   end
 
   def start_server!
     @port = find_available_port
     @thread = Thread.start do
-      app = Geminabox::app(@dir.join("data"))
+      app = Geminabox::app(@dir)
       Rack::Handler::WEBrick.run app, Port: @port, Host: '127.0.0.1'
     end
   end

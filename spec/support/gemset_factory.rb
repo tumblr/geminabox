@@ -1,9 +1,9 @@
 class GemsetFactory
-  def initialize(path)
-    @gem_factory = GemFactory.new(path)
+  def initialize(gem_store)
+    @gem_store = gem_store
   end
 
   def gem(*args)
-    @gem_factory.gem(*args)
+    @gem_store.add(GemFactory.gem(*args))
   end
 end
