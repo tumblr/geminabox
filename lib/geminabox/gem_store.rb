@@ -31,7 +31,11 @@ class Geminabox::GemStore
       gem = Gem::Package.new(tempfile.path)
       file_name = gem.spec.file_name
       IO.copy_stream(tempfile.path, @root_path.join(file_name))
-      @gem_index.push Geminabox::IndexedGem.new
+      @gem_index.push Geminabox::IndexedGem.new(
+        gem.spec.name,
+        gem.spec.version,
+        gem.spec.platform
+      )
     end
   rescue Gem::Package::FormatError
     raise Geminabox::BadGemfile, "Could not process uploaded gemfile."
@@ -41,9 +45,9 @@ class Geminabox::GemStore
     @gem_index
   end
 
-  def delete(*gem_full_name)
-    gem_path = path(*gem_full_name)
-    @gem_index = []
+  def delete(name, version, platform = 'ruby')
+    gem_path = path(name, version, platform)
+    @gem_index.delete(Geminabox::IndexedGem.new(name, version, platform))
     gem_path.delete if gem_path.exist?
   end
 

@@ -79,7 +79,7 @@ RSpec.describe Geminabox::GemStore do
       expect(gem_store.find_gem_versions("hello")).to be_empty
     end
 
-    xit 'deletes only the version specified' do
+    it 'deletes only the version specified' do
       gem_store.add(GemFactory.gem("hello", "1.0.0"))
       gem_store.add(GemFactory.gem("hello", "1.0.1"))
       gem_store.delete("hello", "1.0.0")
