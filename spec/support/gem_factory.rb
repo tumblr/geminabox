@@ -41,7 +41,9 @@ class GemFactory
       tmpfile.close
       Dir.mktmpdir do |dir|
         Dir.chdir(dir) do
-          system "gem build #{tmpfile.path}"
+          Bundler.with_clean_env do
+            system "gem build #{tmpfile.path}"
+          end
           raise "Failed to build gem #{name}" unless File.exist? filename
           return File.open(filename, encoding: 'ascii-8bit')
         end

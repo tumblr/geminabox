@@ -9,3 +9,4 @@ end
 
 require "geminabox/server"
 require "geminabox/filename_generator"
+require "geminabox/indexed_gem"

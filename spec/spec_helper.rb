@@ -19,9 +19,10 @@ RSpec.configure do |config|
 
   Kernel.srand config.seed
 
-#  if config.files_to_run.one?
-#    config.default_formatter = 'doc'
-#  end
+  if config.files_to_run.one?
+    config.default_formatter = 'doc'
+    config.profile_examples = false
+  end
 end
 
 Dir[File.expand_path("../support/**/*.rb", __FILE__)].each do |f|

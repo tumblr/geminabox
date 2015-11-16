@@ -2,11 +2,11 @@ RSpec.describe Geminabox::GemStore do
   describe '#get_path' do
     context 'when the file exists' do
       before do
-        FileUtils.touch "#{dir}/billy.gem"
+        FileUtils.touch "#{dir}/billy-1.0.1.gem"
       end
 
       it 'returns the path to the named gem' do
-        expect(gem_store.get_path('billy')).to eq("#{dir}/billy.gem")
+        expect(gem_store.get_path('billy-1.0.1')).to eq("#{dir}/billy-1.0.1.gem")
       end
     end
 
@@ -40,15 +40,51 @@ RSpec.describe Geminabox::GemStore do
   end
 
   describe '#delete' do
-    it 'deletes the gem'
-    it 'handles double deletes with grace'
+    it 'deletes the gem' do
+      gem_store.add(GemFactory.gem("hello", "1.0.0"))
+      gem_store.delete("hello", "1.0.0")
+      expect(gem_store).not_to have_gem("hello", "1.0.0")
+    end
+
+    it 'handles double deletes with grace' do
+      gem_store.add(GemFactory.gem("hello", "1.0.0"))
+      gem_store.delete("hello", "1.0.0")
+      expect{ gem_store.delete("hello", "1.0.0") }.not_to raise_error
+      expect(gem_store).not_to have_gem("hello", "1.0.0")
+      gem_store.delete("hello", "1.0.0")
+    end
   end
 
   describe '#find_gem_versions' do
-    it 'returns IndexedGem objects'
-    it 'lists the versions previously added for the specific gem'
-    it 'returns an empty set when no versions exist'
-    it 'does not return gems that have been deleted'
+    it 'returns IndexedGem objects' do
+      gem_store.add(GemFactory.gem("a-gem"))
+      actual = gem_store.find_gem_versions("a-gem")
+      expect(actual).to be_a(Array)
+      expect(actual.first).to be_a(Geminabox::IndexedGem)
+    end
+
+    it 'lists the versions previously added for the specific gem' do
+      gem_store.add(GemFactory.gem("hello", "1.0.0"))
+      gem_store.add(GemFactory.gem("hello", "1.0.1"))
+      expect(gem_store.find_gem_versions("hello").length).to eq 2
+    end
+
+    it 'returns an empty set when no versions exist' do
+      expect(gem_store.find_gem_versions("not-a-gem")).to be_empty
+    end
+
+    it 'does not return gems that have been deleted' do
+      gem_store.add(GemFactory.gem("hello", "1.0.0"))
+      gem_store.delete("hello", "1.0.0")
+      expect(gem_store.find_gem_versions("hello")).to be_empty
+    end
+
+    xit 'deletes only the version specified' do
+      gem_store.add(GemFactory.gem("hello", "1.0.0"))
+      gem_store.add(GemFactory.gem("hello", "1.0.1"))
+      gem_store.delete("hello", "1.0.0")
+      expect(gem_store.find_gem_versions("hello").length).to eq 1
+    end
   end
 
   attr_reader :gem_store, :dir

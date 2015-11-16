@@ -27,7 +27,6 @@ protected
   def dependencies
     deps.collect do |dep, requirement|
       dep = [*dep]
-      gem(*dep)
       if requirement
         "s.add_dependency(#{dep.first.to_s.inspect}, #{requirement.inspect})"
       else

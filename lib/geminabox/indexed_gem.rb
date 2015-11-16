@@ -1,0 +1,2 @@
+class Geminabox::IndexedGem
+end

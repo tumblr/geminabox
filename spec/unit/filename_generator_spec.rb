@@ -23,10 +23,9 @@ RSpec.describe Geminabox::FilenameGenerator do
       end
     end
 
-    context "with version of nil" do
+    context "with full name passed" do
       it do
-        expect{ gem_filename("foo", nil, "ruby") }
-          .to raise_error(ArgumentError)
+        expect(gem_filename("foo-1.2.3", nil, "ruby")).to eq("foo-1.2.3.gem")
       end
     end
 
