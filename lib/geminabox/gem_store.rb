@@ -38,6 +38,10 @@ class Geminabox::GemStore
     pathname.to_s
   end
 
+  def get(gem_full_name)
+    File.open(get_path(gem_full_name))
+  end
+
   def has_gem?(gem_full_name, version = nil, platform = "ruby")
     path(gem_full_name, version, platform).exist?
   end
@@ -107,9 +111,9 @@ protected
 end
 
 def Geminabox::GemStore(path)
-  if path.respond_to? :get_path
-    path
-  else
+  if path.is_a? String or path.is_a? Pathname
     Geminabox::GemStore.new(path)
+  else
+    path
   end
 end

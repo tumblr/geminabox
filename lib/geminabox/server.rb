@@ -16,6 +16,7 @@ class Geminabox::Server < Sinatra::Base
     if gems = params["gems"]
       gems = params["gems"].split(",")
       indexed_gems = gem_store.find_gem_versions(gems)
+      content_type "application/octet-stream"
       Marshal.dump(indexed_gems.map(&:to_hash))
     else
       ''
@@ -23,7 +24,12 @@ class Geminabox::Server < Sinatra::Base
   end
 
   get '/gems/:file.gem' do
-    send_file gem_store.get_path(params[:file])
+    io = gem_store.get(params[:file])
+    content_type "application/octet-stream"
+    io
+  end
+
+  post '/gems' do
   end
 
   get '/*' do
