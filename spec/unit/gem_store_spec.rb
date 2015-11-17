@@ -111,6 +111,12 @@ RSpec.describe Geminabox::GemStore do
         ['bar', '~> 1.2'],
       ]
     end
+
+    it 'handles multiple gems at once' do
+      gem_store.add(GemFactory.gem("hello", "1.0.0"))
+      gem_store.add(GemFactory.gem("foo", "1.0.1"))
+      expect(gem_store.find_gem_versions(["hello", "foo"]).length).to eq 2
+    end
   end
 
   it "persists between restarts" do

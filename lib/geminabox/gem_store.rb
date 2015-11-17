@@ -79,8 +79,8 @@ class Geminabox::GemStore
     raise Geminabox::BadGemfile, "Could not process uploaded gemfile."
   end
 
-  def find_gem_versions(name)
-    @db[:gems].where(name: name).map{|row|
+  def find_gem_versions(names)
+    @db[:gems].where(name: names).map{|row|
       deps = @db[:dependencies].where(gem_id: row[:id]).each_with_object({}){|dependencies_row, hash|
         hash[dependencies_row[:dependency_name]] = dependencies_row[:dependency_number]
       }

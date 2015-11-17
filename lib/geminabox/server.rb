@@ -15,9 +15,7 @@ class Geminabox::Server < Sinatra::Base
   get '/api/v1/dependencies' do
     if gems = params["gems"]
       gems = params["gems"].split(",")
-      indexed_gems = gems.sort.flat_map{|name|
-        gem_store.find_gem_versions(name)
-      }
+      indexed_gems = gem_store.find_gem_versions(gems)
       Marshal.dump(indexed_gems.map(&:to_hash))
     else
       ''
