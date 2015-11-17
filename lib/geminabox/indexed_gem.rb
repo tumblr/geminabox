@@ -2,10 +2,11 @@ require "geminabox/filename_generator"
 
 class Geminabox::IndexedGem
   include Geminabox::FilenameGenerator
-  attr_reader :name, :version, :platform
+  attr_reader :name, :version, :platform, :dependencies
 
-  def initialize(name, version, platform)
+  def initialize(name, version, platform, dependencies = {})
     @name, @version, @platform = String(name), String(version), String(platform)
+    @dependencies = dependencies.to_a
     if [@name, @version, @platform].any?(&:empty?)
       raise ArgumentError, "name, version and platform are all required"
     end
@@ -24,5 +25,14 @@ class Geminabox::IndexedGem
 
   def hash
     [name, version, platform].hash
+  end
+
+  def to_hash
+    {
+      name: name,
+      number: version,
+      platform: platform,
+      dependencies: dependencies,
+    }
   end
 end

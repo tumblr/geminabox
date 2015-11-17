@@ -24,6 +24,11 @@ RSpec.describe Geminabox::GemStore do
       expect(gem_store).to have_gem('hello', '1.0.0')
     end
 
+    it 'saves gems with dependencies' do
+      gem_store.add(GemFactory.gem('depgem', '1.0.0', deps: {foo: '>0.0.0'}))
+      expect(gem_store).to have_gem('depgem', '1.0.0')
+    end
+
     it 'rejects gems with no content' do
       expect{gem_store.add(StringIO.new(""))}
         .to raise_error(Geminabox::BadGemfile)
@@ -73,6 +78,14 @@ RSpec.describe Geminabox::GemStore do
       expect(gem_store.find_gem_versions("not-a-gem")).to be_empty
     end
 
+    it 'does not return gems that have a different name' do
+      gem_store.add(GemFactory.gem("hello", "1.0.0"))
+      gem_store.add(GemFactory.gem("world", "1.0.0"))
+      expect(gem_store.find_gem_versions("world")).to eq([
+        Geminabox::IndexedGem.new("world", "1.0.0", "ruby")
+      ])
+    end
+
     it 'does not return gems that have been deleted' do
       gem_store.add(GemFactory.gem("hello", "1.0.0"))
       gem_store.delete("hello", "1.0.0")
@@ -85,6 +98,28 @@ RSpec.describe Geminabox::GemStore do
       gem_store.delete("hello", "1.0.0")
       expect(gem_store.find_gem_versions("hello").length).to eq 1
     end
+
+    it 'returns indexed gems with dependency information' do
+      gem_store.add(GemFactory.gem('depgem', '1.1.0', deps: {foo: '> 0.0.0', bar: '~> 1.2'}))
+      indexed_gems = gem_store.find_gem_versions("depgem")
+      expect(indexed_gems).to eq([
+        Geminabox::IndexedGem.new('depgem', '1.1.0', 'ruby'),
+      ])
+
+      expect(indexed_gems.first.dependencies).to eq [
+        ['foo', '> 0.0.0'],
+        ['bar', '~> 1.2'],
+      ]
+    end
+  end
+
+  it "persists between restarts" do
+    gem_store.add(GemFactory.gem("world", "1.0.0"))
+    @gem_store = Geminabox::GemStore.new(@dir)
+    expect(gem_store.get_path('world-1.0.0')).to eq("#{dir}/world-1.0.0.gem")
+    expect(gem_store.find_gem_versions("world")).to eq([
+      Geminabox::IndexedGem.new("world", "1.0.0", "ruby")
+    ])
   end
 
   attr_reader :gem_store, :dir
@@ -96,4 +131,5 @@ RSpec.describe Geminabox::GemStore do
       example.run
     end
   end
+
 end

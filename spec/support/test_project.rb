@@ -25,6 +25,16 @@ class TestProject
     FileUtils.remove_entry @dir.join("vendor")
   end
 
+  def bundle_status
+    Bundler.with_clean_env do
+      Dir.chdir @dir do
+        status = open("|bundle show").read
+        raise status unless $? == 0
+        return BundlerOutputParser.new(status)
+      end
+    end
+  end
+
   def has_gems_installed?
     Bundler.with_clean_env do
       Dir.chdir @dir do
@@ -32,6 +42,10 @@ class TestProject
         return $? == 0
       end
     end
+  end
+
+  def has_gem?(name, version)
+    bundle_status.has?(name, version)
   end
 
 protected

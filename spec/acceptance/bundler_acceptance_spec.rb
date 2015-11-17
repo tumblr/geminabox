@@ -3,7 +3,9 @@ require 'bundler'
 RSpec.describe 'using bundler with Geminabox server' do
   let(:server) {
     TestServer.new do |server|
-      server.gem 'test', '1.0'
+      server.gem 'test', '1.0', deps: { othertest: '~>1.0.0' }
+      server.gem 'othertest', '1.0.1'
+      server.gem 'othertest', '0.0.1'
     end
   }
 
@@ -25,6 +27,8 @@ RSpec.describe 'using bundler with Geminabox server' do
   it 'installs the gem test' do
     project.bundle!
     expect(project).to have_gems_installed
+    expect(project).to have_gem('test', '1.0')
+    expect(project).to have_gem('othertest', '1.0.1')
   end
 
   it 'installs the gem test after removing vendor' do

@@ -13,8 +13,8 @@ RSpec.configure do |config|
 
   config.example_status_persistence_file_path = "spec/.rspec-status.txt"
   config.disable_monkey_patching!
-  config.warnings = true
-  config.profile_examples = 10
+  #config.warnings = true
+  #config.profile_examples = 10
   config.order = :random
 
   Kernel.srand config.seed
