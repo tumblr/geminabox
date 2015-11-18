@@ -31,8 +31,4 @@ class Geminabox::Server < Sinatra::Base
 
   post '/gems' do
   end
-
-  get '/*' do
-    p env
-  end
 end
