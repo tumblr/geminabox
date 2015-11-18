@@ -8,7 +8,7 @@ RSpec.describe Geminabox::Server do
   }
 
   let(:app) {
-    Geminabox::Server.new(gem_store)
+    Geminabox.app(gem_store)
   }
 
   describe "GET /gems/:file.gem" do
@@ -46,6 +46,13 @@ RSpec.describe Geminabox::Server do
         {name: "name", number: "1.1.1", platform: "ruby", dependencies: []},
         {name: "name", number: "1.1.2", platform: "ruby", dependencies: []},
       ]
+    end
+  end
+
+  describe "GET /" do
+    it "returns a 200 OK" do
+      get "/"
+      expect(last_response.status).to eq 200
     end
   end
 end
