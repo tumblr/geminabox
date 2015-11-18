@@ -8,38 +8,8 @@ require "sequel"
 class Geminabox::GemStore
   include Geminabox::FilenameGenerator
 
-  def initialize(path)
-    @root_path = Pathname.new(path)
-    database_path = @root_path.join("database.sqlite3")
-    @db = Sequel.connect("sqlite://#{database_path}")
-    if not database_path.exist?
-      @db.create_table :gems do
-        primary_key :id
-        String :name
-        String :version
-        String :platform
-        index [:name, :version, :platform], unique: true
-        index :name
-      end
-
-      @db.create_table :dependencies do
-        primary_key :id
-        foreign_key :gem_id, :gems, on_delete: :cascade
-        String :dependency_name
-        String :dependency_number
-      end
-    end
-  end
-
-  def get_path(gem_full_name)
-    pathname = path(gem_full_name)
-    pathname.exist? or
-      raise Geminabox::GemNotFound.new("Gem #{gem_full_name} not found")
-    pathname.to_s
-  end
-
   def get(gem_full_name)
-    File.open(get_path(gem_full_name))
+    get_path(gem_full_name).open
   end
 
   def has_gem?(gem_full_name, version = nil, platform = "ruby")
@@ -108,6 +78,37 @@ protected
     filename = gem_filename(*gem_full_name)
     @root_path.join(filename)
   end
+
+  def get_path(gem_full_name)
+    pathname = path(gem_full_name)
+    pathname.exist? or
+      raise Geminabox::GemNotFound.new("Gem #{gem_full_name} not found")
+    pathname
+  end
+
+  def initialize(path)
+    @root_path = Pathname.new(path)
+    database_path = @root_path.join("database.sqlite3")
+    @db = Sequel.connect("sqlite://#{database_path}")
+    if not database_path.exist?
+      @db.create_table :gems do
+        primary_key :id
+        String :name
+        String :version
+        String :platform
+        index [:name, :version, :platform], unique: true
+        index :name
+      end
+
+      @db.create_table :dependencies do
+        primary_key :id
+        foreign_key :gem_id, :gems, on_delete: :cascade
+        String :dependency_name
+        String :dependency_number
+      end
+    end
+  end
+
 end
 
 def Geminabox::GemStore(path)

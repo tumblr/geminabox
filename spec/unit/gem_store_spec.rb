@@ -1,18 +1,18 @@
 RSpec.describe Geminabox::GemStore do
-  describe '#get_path' do
+  describe '#get' do
     context 'when the file exists' do
       before do
-        FileUtils.touch "#{dir}/billy-1.0.1.gem"
+        File.write("#{dir}/billy-1.0.1.gem", "hello")
       end
 
       it 'returns the path to the named gem' do
-        expect(gem_store.get_path('billy-1.0.1')).to eq("#{dir}/billy-1.0.1.gem")
+        expect(gem_store.get('billy-1.0.1').read).to eq("hello")
       end
     end
 
     context 'when the file does not exists' do
       it 'returns the path to the named gem' do
-        expect{gem_store.get_path('billy')}
+        expect{gem_store.get('billy')}
           .to raise_error(Geminabox::GemNotFound)
       end
     end
@@ -121,11 +121,17 @@ RSpec.describe Geminabox::GemStore do
 
   it "persists between restarts" do
     gem_store.add(GemFactory.gem("world", "1.0.0"))
-    @gem_store = Geminabox::GemStore.new(@dir)
-    expect(gem_store.get_path('world-1.0.0')).to eq("#{dir}/world-1.0.0.gem")
+    @gem_store = Geminabox::GemStore(@dir)
+    expect(gem_store.get('world-1.0.0')).to be_a(IO)
     expect(gem_store.find_gem_versions("world")).to eq([
       Geminabox::IndexedGem.new("world", "1.0.0", "ruby")
     ])
+  end
+
+  describe "Geminabox::GemStore()" do
+    it "returns the original GemStore if one is passed" do
+      expect(Geminabox::GemStore(@gem_store)).to be(@gem_store)
+    end
   end
 
   attr_reader :gem_store, :dir
