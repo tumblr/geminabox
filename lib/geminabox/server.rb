@@ -30,5 +30,7 @@ class Geminabox::Server < Sinatra::Base
   end
 
   post '/gems' do
+    gem_store.add request.body
+    201
   end
 end

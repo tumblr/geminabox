@@ -21,6 +21,11 @@ class TestServer
     "http://127.0.0.1:#{@port}"
   end
 
+  def http_client(&block)
+    uri = URI(url)
+    Net::HTTP.start(uri.host, uri.port, &block)
+  end
+
 protected
   def create_gemstore!
     @dir = Pathname.new(Dir.mktmpdir)
